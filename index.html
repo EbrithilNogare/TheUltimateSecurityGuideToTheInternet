@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>The Security Guide to the Internet</title>
+  <link rel="shortcut icon" href="TemplateData/favicon.png">
+  <style>
+    html {
+        box-sizing: border-box;
+    }
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    canvas {
+        display: block;
+    }
+    #unity-container {
+        width: 100%;
+        height: 100%;
+    }
+    #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #231F20;
+    }
+    #loading-cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #unity-progress-bar-empty {
+        width: 80%;
+        height: 16px;
+        background: color-mix(in srgb, #1f4821 50%, transparent);
+        border-radius: 8px;
+    }
+    #unity-progress-bar-full {
+        width: 0%;
+        height: 100%;
+        background: #1f4821;
+        border-radius: inherit;
+    }
+
+    #unity-fullscreen-button {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: 38px;
+        height: 38px;
+        fill: #fff;
+    }
+
+  </style>
+</head>
+
+<body class="dark">
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+  <div id="loading-cover">
+    <div id="unity-progress-bar-empty">
+      <div id="unity-progress-bar-full"></div>
+    </div>
+  </div>
+  </div>
+  <svg id="unity-fullscreen-button" focusable="false" aria-hidden="true"
+    viewBox="0 0 24 24">
+    <path
+      d="M7 14H5v5h5v-2H7zm-2-4h2V7h3V5H5zm12 7h-3v2h5v-5h-2zM14 5v2h3v3h2V5z">
+    </path>
+  </svg>
+  <script>
+    const buildUrl = "Build";
+    const loaderUrl = buildUrl + "/TheSecurityGuideToTheInternet.loader.js";
+    const config = {
+      dataUrl: buildUrl + "/TheSecurityGuideToTheInternet.data",
+      frameworkUrl: buildUrl + "/TheSecurityGuideToTheInternet.framework.js",
+      codeUrl: buildUrl + "/TheSecurityGuideToTheInternet.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "CharlesUniversityFacultyOfMathematicsAndPhysics",
+      productName: "The Security Guide to the Internet",
+      productVersion: "0.3.17",
+    };
+
+    const container = document.querySelector("#unity-container");
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingCover = document.querySelector("#loading-cover");
+    const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+    const progressBarFull = document.querySelector("#unity-progress-bar-full");
+    const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    const spinner = document.querySelector('.spinner');
+
+    const canFullscreen = (function () {
+      for (const key of [
+        'exitFullscreen',
+        'webkitExitFullscreen',
+        'webkitCancelFullScreen',
+        'mozCancelFullScreen',
+        'msExitFullscreen',
+      ]) {
+        if (key in document) {
+          return true;
+        }
+      }
+      return false;
+    }());
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      container.className = "unity-mobile";
+      // config.devicePixelRatio = 1;
+    }
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = `${100 * progress}%`;
+      }).then((unityInstance) => {
+        loadingCover.style.display = "none";
+        if (canFullscreen) {
+          fullscreenButton.onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+        }
+      }).catch((message) => {
+        alert(message);
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+
+</html>
